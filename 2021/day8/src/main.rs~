@@ -1,0 +1,657 @@
+use std::io::{self, BufRead};
+
+fn main() {
+
+    let mut sig_vec  : Vec<String> = Vec::new();
+
+    let stdin = io::stdin();
+
+    //let mut nread : i32 = 0;
+
+
+    for line in stdin.lock().lines() {
+
+        let bin = line.unwrap().trim().to_string();
+
+        println!("file_read: {}", bin);
+
+        // Creates new String object, allocates memory in heap
+        let mut s = String::new();
+        s.push_str( &bin );
+
+        // signals
+        sig_vec.push( s );
+   
+        //nread += 1;
+    }
+
+
+
+
+    let mut unique : i32 = 0;
+
+
+    let sig_len : usize = sig_vec.len();
+    for i in 0..sig_len {
+
+
+
+        // initally all segments can be all all digits
+        let mut seg_a : [bool; 10] = [ false; 10 ];
+        let mut seg_b : [bool; 10] = [ false; 10 ];
+        let mut seg_c : [bool; 10] = [ false; 10 ];
+        let mut seg_d : [bool; 10] = [ false; 10 ];
+        let mut seg_e : [bool; 10] = [ false; 10 ];
+        let mut seg_f : [bool; 10] = [ false; 10 ];
+        let mut seg_g : [bool; 10] = [ false; 10 ];
+
+
+
+        let mut outval_read : i32 = 0;
+        let mut delim_read : bool = false;
+
+        let bin = sig_vec[i].to_string();
+        println!("readSig: {}  delim --> {}", bin, delim_read);
+
+        let mut iter = bin.split_whitespace();
+        loop {
+            let s1 : String = iter.next().unwrap().to_string();
+            println!("readIter: {}  delim --> {}", s1, delim_read);
+
+            if delim_read {
+
+                // set outval
+
+                let mut can_be : [bool; 10] = [ true; 10 ];
+
+                let pat_len : usize = s1.chars().count();
+                if pat_len == 2 {
+                    // this must be '1'
+                    can_be[0] = false;
+                    can_be[1] = true;
+                    can_be[2] = false;
+                    can_be[3] = false;
+                    can_be[4] = false;
+                    can_be[5] = false;
+                    can_be[6] = false;
+                    can_be[7] = false;
+                    can_be[8] = false;
+                    can_be[9] = false;
+                    unique += 1;
+                }
+                if pat_len == 3 {
+                    // this must be '7'
+                    can_be[0] = false;
+                    can_be[1] = false;
+                    can_be[2] = false;
+                    can_be[3] = false;
+                    can_be[4] = false;
+                    can_be[5] = false;
+                    can_be[6] = false;
+                    can_be[7] = true;
+                    can_be[8] = false;
+                    can_be[9] = false;
+                    unique += 1;
+                }
+                if pat_len == 4 {
+                    // this must be '4'
+                    can_be[0] = false;
+                    can_be[1] = false;
+                    can_be[2] = false;
+                    can_be[3] = false;
+                    can_be[4] = true;
+                    can_be[5] = false;
+                    can_be[6] = false;
+                    can_be[7] = false;
+                    can_be[8] = false;
+                    can_be[9] = false;
+                    unique += 1;
+                }
+                if pat_len == 5 {
+                    // this must be '2','3,'5'
+                    can_be[0] = false;
+                    can_be[1] = false;
+                    can_be[2] = true;
+                    can_be[3] = true;
+                    can_be[4] = false;
+                    can_be[5] = true;
+                    can_be[6] = false;
+                    can_be[7] = false;
+                    can_be[8] = false;
+                    can_be[9] = false;
+                    unique += 1;
+                }
+                if pat_len == 6 {
+                    // this must be '0','6,'9'
+                    can_be[0] = true;
+                    can_be[1] = false;
+                    can_be[2] = false;
+                    can_be[3] = false;
+                    can_be[4] = false;
+                    can_be[5] = false;
+                    can_be[6] = true;
+                    can_be[7] = false;
+                    can_be[8] = false;
+                    can_be[9] = true;
+                    unique += 1;
+                }
+                if pat_len == 7 {
+                    // this must be '8'
+                    can_be[0] = false;
+                    can_be[1] = false;
+                    can_be[2] = false;
+                    can_be[3] = false;
+                    can_be[4] = false;
+                    can_be[5] = false;
+                    can_be[6] = false;
+                    can_be[7] = false;
+                    can_be[8] = true;
+                    can_be[9] = false;
+                    unique += 1;
+                }
+
+
+                println!("CAN BE 1");
+                println!("0-1-2-3-4-5-6-7-8-9");
+                for ix in can_be {
+                    if ix { print!("1 "); }
+                    else { print!("0 "); }
+                }
+                println!("");
+
+
+
+                // input signals
+                let pat_len : usize = s1.chars().count();
+                for (i, c) in s1.chars().enumerate() {
+                    // do something with character `c` and index `i`
+                    println!("out_char at {} is {}", i, c);
+                    let mut dig : i32 = 0;
+                    for ix in can_be {
+                        if c == 'a' {
+                          if seg_a[ dig as usize ] == false {
+                              can_be[ dig as usize ] = false;
+                          }
+                        }
+                        if c == 'b' {
+                          if seg_b[ dig as usize ] == false {
+                              can_be[ dig as usize ] = false;
+                          }
+                        }
+                        if c == 'c' {
+                          if seg_c[ dig as usize ] == false {
+                              can_be[ dig as usize ] = false;
+                          }
+                        }
+                        if c == 'd' {
+                          if seg_d[ dig as usize ] == false {
+                              can_be[ dig as usize ] = false;
+                          }
+                        }
+                        if c == 'e' {
+                          if seg_e[ dig as usize ] == false {
+                              can_be[ dig as usize ] = false;
+                          }
+                        }
+                        if c == 'f' {
+                          if seg_f[ dig as usize ] == false {
+                              can_be[ dig as usize ] = false;
+                          }
+                        }
+                        if c == 'g' {
+                          if seg_g[ dig as usize ] == false {
+                              can_be[ dig as usize ] = false;
+                          }
+                        }
+                        dig += 1;   
+                    }
+                }
+
+
+                println!("CAN BE 2");
+                println!("0-1-2-3-4-5-6-7-8-9");
+                for ix in can_be {
+                    if ix { print!("1 "); }
+                    else { print!("0 "); }
+                }
+                println!("");
+
+
+
+                outval_read += 1;
+                if outval_read == 4 {
+                    break;
+                }
+            }
+            else {
+
+
+                // check for delimiter
+                let ch = s1.chars().next().unwrap();
+                if ch == '|' {
+
+
+                   println!("DELIM READ: BEFORE FILTERING");
+                   print!("a: ");
+                   for a in seg_a {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("b: ");
+                   for a in seg_b {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("c: ");
+                   for a in seg_c {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("d: ");
+                   for a in seg_d {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("e: ");
+                   for a in seg_e {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("f: ");
+                   for a in seg_f {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("g: ");
+                   for a in seg_g {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+
+
+
+                   // ok do some calc....
+
+                   // if '1', then also can be '0','3','4','7','8','9'
+                   // if '4', then also can be '8','9'
+                   // if '7', then also can be '0','3','8','9'
+
+                   if seg_a[1] == true {
+                       seg_a[0] == true;
+                       seg_a[3] == true;
+                       seg_a[4] == true;
+                       seg_a[7] == true;
+                       seg_a[8] == true;
+                       seg_a[9] == true;
+                   }
+                   if seg_a[4] == true {
+                       seg_a[8] == true;
+                       seg_a[9] == true;
+                   }
+                   if seg_a[7] == true {
+                       seg_a[0] == true;
+                       seg_a[3] == true;
+                       seg_a[8] == true;
+                       seg_a[9] == true;
+                   }
+
+                   if seg_b[1] == true {
+                       seg_b[0] == true;
+                       seg_b[3] == true;
+                       seg_b[4] == true;
+                       seg_b[7] == true;
+                       seg_b[8] == true;
+                       seg_b[9] == true;
+                   }
+                   if seg_b[4] == true {
+                       seg_b[8] == true;
+                       seg_b[9] == true;
+                   }
+                   if seg_b[7] == true {
+                       seg_b[0] == true;
+                       seg_b[3] == true;
+                       seg_b[8] == true;
+                       seg_b[9] == true;
+                   }
+
+                   if seg_c[1] == true {
+                       seg_c[0] == true;
+                       seg_c[3] == true;
+                       seg_c[4] == true;
+                       seg_c[7] == true;
+                       seg_c[8] == true;
+                       seg_c[9] == true;
+                   }
+                   if seg_c[4] == true {
+                       seg_c[8] == true;
+                       seg_c[9] == true;
+                   }
+                   if seg_c[7] == true {
+                       seg_c[0] == true;
+                       seg_c[3] == true;
+                       seg_c[8] == true;
+                       seg_c[9] == true;
+                   }
+
+                   if seg_d[1] == true {
+                       seg_d[0] == true;
+                       seg_d[3] == true;
+                       seg_d[4] == true;
+                       seg_d[7] == true;
+                       seg_d[8] == true;
+                       seg_d[9] == true;
+                   }
+                   if seg_d[4] == true {
+                       seg_d[8] == true;
+                       seg_d[9] == true;
+                   }
+                   if seg_d[7] == true {
+                       seg_d[0] == true;
+                       seg_d[3] == true;
+                       seg_d[8] == true;
+                       seg_d[9] == true;
+                   }
+
+                   if seg_e[1] == true {
+                       seg_e[0] == true;
+                       seg_e[3] == true;
+                       seg_e[4] == true;
+                       seg_e[7] == true;
+                       seg_e[8] == true;
+                       seg_e[9] == true;
+                   }
+                   if seg_e[4] == true {
+                       seg_e[8] == true;
+                       seg_e[9] == true;
+                   }
+                   if seg_e[7] == true {
+                       seg_e[0] == true;
+                       seg_e[3] == true;
+                       seg_e[8] == true;
+                       seg_e[9] == true;
+                   }
+
+                   if seg_f[1] == true {
+                       seg_f[0] == true;
+                       seg_f[3] == true;
+                       seg_f[4] == true;
+                       seg_f[7] == true;
+                       seg_f[8] == true;
+                       seg_f[9] == true;
+                   }
+                   if seg_f[4] == true {
+                       seg_f[8] == true;
+                       seg_f[9] == true;
+                   }
+                   if seg_f[7] == true {
+                       seg_f[0] == true;
+                       seg_f[3] == true;
+                       seg_f[8] == true;
+                       seg_f[9] == true;
+                   }
+
+                   if seg_g[1] == true {
+                       seg_g[0] == true;
+                       seg_g[3] == true;
+                       seg_g[4] == true;
+                       seg_g[7] == true;
+                       seg_g[8] == true;
+                       seg_g[9] == true;
+                   }
+                   if seg_g[4] == true {
+                       seg_g[8] == true;
+                       seg_g[9] == true;
+                   }
+                   if seg_g[7] == true {
+                       seg_g[0] == true;
+                       seg_g[3] == true;
+                       seg_g[8] == true;
+                       seg_g[9] == true;
+                   }
+
+
+                   println!("DELIM READ: AFTER FILTERING");
+                   print!("a: ");
+                   for a in seg_a {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("b: ");
+                   for a in seg_b {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("c: ");
+                   for a in seg_c {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("d: ");
+                   for a in seg_d {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("e: ");
+                   for a in seg_e {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("f: ");
+                   for a in seg_f {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+                   print!("g: ");
+                   for a in seg_g {
+                       if a { print!("1 "); }
+                       else { print!("0 "); }
+                   }
+                   println!("");
+
+
+
+
+                   delim_read = true;
+                   continue;
+                }
+
+
+
+                // input signals
+                let pat_len : usize = s1.chars().count();
+                for (i, c) in s1.chars().enumerate() {
+                    // do something with character `c` and index `i`
+                    println!("char at {} is {}", i, c);
+
+                    if pat_len == 2 {
+                        // must be '1'
+                        if c == 'a' {
+                            seg_a[ 1 ] = true;
+                        }
+                        if c == 'b' {
+                            seg_b[ 1 ] = true;
+                        }
+                        if c == 'c' {
+                            seg_c[ 1 ] = true;
+                        }
+                        if c == 'd' {
+                            seg_d[ 1 ] = true;
+                        }
+                        if c == 'e' {
+                            seg_e[ 1 ] = true;
+                        }
+                        if c == 'f' {
+                            seg_f[ 1 ] = true;
+                        }
+                        if c == 'g' {
+                            seg_g[ 1 ] = true;
+                        }
+                    }
+                    if pat_len == 3 {
+                        // must be '7'
+                        if c == 'a' {
+                            seg_a[ 7 ] = true;
+                        }
+                        if c == 'b' {
+                            seg_b[ 7 ] = true;
+                        }
+                        if c == 'c' {
+                            seg_c[ 7 ] = true;
+                        }
+                        if c == 'd' {
+                            seg_d[ 7 ] = true;
+                        }
+                        if c == 'e' {
+                            seg_e[ 7 ] = true;
+                        }
+                        if c == 'f' {
+                            seg_f[ 7 ] = true;
+                        }
+                        if c == 'g' {
+                            seg_g[ 7 ] = true;
+                        }
+                    }
+                    if pat_len == 4 {
+                        // must be '4'
+                        if c == 'a' {
+                            seg_a[ 4 ] = true;
+                        }
+                        if c == 'b' {
+                            seg_b[ 4 ] = true;
+                        }
+                        if c == 'c' {
+                            seg_c[ 4 ] = true;
+                        }
+                        if c == 'd' {
+                            seg_d[ 4 ] = true;
+                        }
+                        if c == 'e' {
+                            seg_e[ 4 ] = true;
+                        }
+                        if c == 'f' {
+                            seg_f[ 4 ] = true;
+                        }
+                        if c == 'g' {
+                            seg_g[ 4 ] = true;
+                        }
+                    }
+                    if pat_len == 5 {
+                        // can be '2', '3', '5'
+                        if c == 'a' {
+                            seg_a[ 2 ] = true;
+                            seg_a[ 3 ] = true;
+                            seg_a[ 5 ] = true;
+                        }
+                        if c == 'b' {
+                            seg_b[ 2 ] = true;
+                            seg_b[ 3 ] = true;
+                            seg_b[ 5 ] = true;
+                        }
+                        if c == 'c' {
+                            seg_c[ 2 ] = true;
+                            seg_c[ 3 ] = true;
+                            seg_c[ 5 ] = true;
+                        }
+                        if c == 'd' {
+                            seg_d[ 2 ] = true;
+                            seg_d[ 3 ] = true;
+                            seg_d[ 5 ] = true;
+                        }
+                        if c == 'e' {
+                            seg_e[ 2 ] = true;
+                            seg_e[ 3 ] = true;
+                            seg_e[ 5 ] = true;
+                        }
+                        if c == 'f' {
+                            seg_f[ 2 ] = true;
+                            seg_f[ 3 ] = true;
+                            seg_f[ 5 ] = true;
+                        }
+                        if c == 'g' {
+                            seg_g[ 2 ] = true;
+                            seg_g[ 3 ] = true;
+                            seg_g[ 5 ] = true;
+                        }
+                    }
+                    if pat_len == 6 {
+                        // can be '0', '6, '9'
+                        if c == 'a' {
+                            seg_a[ 0 ] = true;
+                            seg_a[ 6 ] = true;
+                            seg_a[ 9 ] = true;
+                        }
+                        if c == 'b' {
+                            seg_b[ 0 ] = true;
+                            seg_b[ 6 ] = true;
+                            seg_b[ 9 ] = true;
+                        }
+                        if c == 'c' {
+                            seg_c[ 0 ] = true;
+                            seg_c[ 6 ] = true;
+                            seg_c[ 9 ] = true;
+                        }
+                        if c == 'd' {
+                            seg_d[ 0 ] = true;
+                            seg_d[ 6 ] = true;
+                            seg_d[ 9 ] = true;
+                        }
+                        if c == 'e' {
+                            seg_e[ 0 ] = true;
+                            seg_e[ 6 ] = true;
+                            seg_e[ 9 ] = true;
+                        }
+                        if c == 'f' {
+                            seg_f[ 0 ] = true;
+                            seg_f[ 6 ] = true;
+                            seg_f[ 9 ] = true;
+                        }
+                        if c == 'g' {
+                            seg_g[ 0 ] = true;
+                            seg_g[ 6 ] = true;
+                            seg_g[ 9 ] = true;
+                        }
+                    }
+                    if pat_len == 7 {
+                        // must be '8'
+                        if c == 'a' {
+                            seg_a[ 8 ] = true;
+                        }
+                        if c == 'b' {
+                            seg_b[ 8 ] = true;
+                        }
+                        if c == 'c' {
+                            seg_c[ 8 ] = true;
+                        }
+                        if c == 'd' {
+                            seg_d[ 8 ] = true;
+                        }
+                        if c == 'e' {
+                            seg_e[ 8 ] = true;
+                        }
+                        if c == 'f' {
+                            seg_f[ 8 ] = true;
+                        }
+                        if c == 'g' {
+                            seg_g[ 8 ] = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    println!("unique = {}", unique);
+}
