@@ -56,5 +56,5 @@ end AocApp
 
 
 @main def Main: Unit =
-  println("AOC: Day 1")
+  println("AOC: Day 2")
   val app = new AocApp()
