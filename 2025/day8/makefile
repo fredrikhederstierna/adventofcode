@@ -8,8 +8,15 @@ compile:
 	mkdir -p ./build
 	scala compile -d ./build Main.scala
 
+compile2:
+	mkdir -p ./build
+	scala compile -d ./build Main2.scala
+
 run:
 	scala run -classpath ./build Main.scala
+
+run2:
+	scala run -classpath ./build Main2.scala
 
 clean:
 	rm -rf ./build/
@@ -19,5 +26,11 @@ clean:
 test:
 	scala run -classpath ./build Main.scala < test.in
 
+test2:
+	scala run -classpath ./build Main2.scala < test.in
+
 input:
 	scala run -classpath ./build Main.scala < input.txt
+
+input2:
+	scala run -classpath ./build Main2.scala < input.txt
