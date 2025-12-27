@@ -132,12 +132,17 @@ class Machine(ind_on : Int) :
   // jolt J { 10, 20, 30 }
   // buttons B [ 0 2 ] , [ 1 3 ], [ 0 3 ]
   //
-  //       indicators
-  //      [ 1  0  1 ]
-  //      [ 1  0  1 ]
-  //  B = [ 0  1  1 ] P = [ 10 20 30 ]
-  //      [ 1  1  0 ]
-  //      [ 1  1  0 ]
+  //
+  //  P * B = J
+  //
+  //      indicator affected
+  //  b   [ 1 0 1 1 ]T  [ p1 ]
+  //  u   [ 1 0 0 1 ]   [ p2 ]   [ 101 ]
+  //  t   [ 0 0 1 1 ]   [ p3 ]   [  23 ]
+  //  t   [ 0 1 1 0 ] * [ p4 ] = [ 164 ]
+  //  o   [ 1 1 1 1 ]   [ p5 ]   [  69 ]
+  //  n   [ 1 1 0 0 ]   [ p6 ]
+  //  s   [ 0 0 0 1 ]   [ p7 ]
   //
   //  (p0 * 0|1) + (p1 * 0|1) + ...    = 10
   //  (p0 * 0|1) + (p1 * 0|1) + ...    = 20
@@ -145,6 +150,31 @@ class Machine(ind_on : Int) :
   //
   // minimize sum of presses of buttons:  p0 + p1 + p2 + ... pn
   //
+  //
+  // Under-decided linear equation system optimization problem.
+  // Use ILP - Interger Linear Programming solver library.
+  //
+  // >> B = [0 0 0 1; 0 1 0 1; 0 0 1 0; 0 0 1 1; 1 0 1 0; 1 1 0 0]
+  //
+  // B =
+  //   0   0   0   1
+  //   0   1   0   1
+  //   0   0   1   0
+  //   0   0   1   1
+  //   1   0   1   0
+  //   1   1   0   0
+  //
+  // >> P = [1 3 0 3 1 2]
+  // P =
+  //   1   3   0   3   1   2
+  //
+  // >> S = P * B
+  //
+  // S =
+  //   3   5   4   7
+  //
+  // >> sum(P)
+  //   ans = 10
   //
 
   def simplexSolve(n_indicators : Int) : Int =
