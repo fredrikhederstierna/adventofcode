@@ -27,9 +27,55 @@ import sys
 
 from pulp import *
 
+def solveProblemGeneric(BUT : list[list[int]], JOLT : list[int]):
+
+    n_vars : int = len(BUT)
+    print(f'Generic: {n_vars}')
+
+    prob = LpProblem("My_Problem_Name", LpMinimize) # Or LpMaximize
+    prob += 0 # Dummy ? to avoid error on empty
+    
+    # 1-D dict
+    P = LpVariable.dicts("P", indices=range( n_vars ), lowBound=0, cat=LpInteger)
+
+    # Object function to optimize
+    n_cost = 0
+    obj_f = pulp.LpAffineExpression()
+    for p in P:
+        obj_f += P[n_cost]
+        print(f'Add COST {n_cost} = {p}')
+        n_cost = n_cost + 1
+    prob += obj_f, "Total_Cost"
+
+    # add funcs
+    for c in range(len(BUT[0])-1, -1, -1):
+        expr = pulp.LpAffineExpression()
+        for r in range(0,len(BUT)):
+            print(f'BUT({r},{c}) = {BUT[r][c]}')
+            if (BUT[r][c] != 0):
+                expr += P[r]
+                print(f'    ADD')
+        expr = (expr == JOLT[c])
+        prob += expr, f'Capacity {c}'
+        print(f'   add to prob ===> JOLT {JOLT[c]}')
+
+    prob.solve()
+
+    print(LpStatus[prob.status]) # e.g., Optimal, Infeasible
+    i = 0
+    sum = 0
+    for p in P:
+        val = value(P[i])
+        print(f'P{i} = {val}')
+        sum = sum + val
+        i = i + 1
+    print(f'Sum = {sum}')
+
+    return sum
+
 def solveProblem():
     prob = LpProblem("My_Problem_Name", LpMinimize) # Or LpMaximize
-    prob += 0
+    prob += 0 # Dummy ? to avoid error on empty
 
     #x1 = LpVariable("X1", lowBound=0) # Variable X1 >= 0
     #x2 = LpVariable("X2", lowBound=0) # Variable X2 >= 0
@@ -100,11 +146,13 @@ def solveProblem():
 
 
 def main() -> int:
-    filename = 'test.in'
-    #filename = 'input.txt'
+    #filename = 'test.in'
+    filename = 'input.txt'
     file = open(filename, mode = 'r', encoding = 'utf-8-sig')
     lines = file.readlines()
     file.close()
+
+    totSum = 0
 
     for line in lines:
         line = line.strip()
@@ -116,20 +164,56 @@ def main() -> int:
 
         print(f'READLINE: {line} s1={s1} s2={s2}')
 
+        #BUT = [ [0, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 1, 1], [1, 0, 1, 0], [1, 1, 0, 0] ]
+        #JOLT = [ 3, 5, 4, 7 ]
+        BUT = []
+        JOLT = []
+
+        joltList = s2.split(',')
+        print(f'joltList.len = {len(joltList)}')
+        for j in joltList:
+            JOLT.append(int(j))
+            print(f'jolt: {j}')
+        
+        bi = 0
         butList = s1.split(')')
         print(f'butList.len = {len(butList)}')
         for b in butList:
             b = b.strip()
             b2 = b[1:]
             if (len(b2) > 0):
+                BUT.append([])
                 print(f'but: {b2}')
+                butList2 = b2.split(',')
+                #### PAD BEFRORE + AFTER WITH ZERO, SET '1' as ENABLED
+                for bb in range(0,len(joltList)):
+                    BUT[bi].append(0)
+                for b3 in butList2:
+                    print(f'  bx: {b3}')
+                    BUT[bi][int(b3)] = 1
+                bi = bi + 1
 
-        joltList = s2.split(',')
-        print(f'joltList.len = {len(joltList)}')
-        for j in joltList:
-            print(f'jolt: {j}')
+        print(f'BUT = {BUT}')
+        print(f'JOLT = {JOLT}')
+            
+        totSum = totSum + solveProblemGeneric(BUT, JOLT)
 
-    solveProblem()
+
+    # TEST CODE
+    #
+    #solveProblem()
+    #print("================================")
+    #
+    # TEST
+    # >> B = [0 0 0 1; 0 1 0 1; 0 0 1 0; 0 0 1 1; 1 0 1 0; 1 1 0 0]
+    # >> S = [3 5 4 7]
+    # >> P = [1 3 0 3 1 2]
+    #
+    #BUT = [ [0, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 1, 1], [1, 0, 1, 0], [1, 1, 0, 0] ]
+    #JOLT = [ 3, 5, 4, 7 ]
+    #solveProblemGeneric(BUT, JOLT)
+
+    print(f'TotSum = {totSum}')
 
 if __name__ == '__main__':
     sys.exit(main())  # next section explains the use of sys.exit
