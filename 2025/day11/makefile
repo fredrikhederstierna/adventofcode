@@ -27,6 +27,9 @@ clean:
 test:
 	scala run -classpath ./build Main.scala < test.in
 
+test_part2:
+	scala run -classpath ./build Main.scala < test2.in
+
 test2:
 	scala run -classpath ./build Main2.scala --main-class Main < test.in
 

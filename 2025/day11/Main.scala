@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.Map
 
 import scala.util.control.Breaks._
 
@@ -39,9 +40,12 @@ class Node(name : String) :
   var nodeName = name
 
   var visited : Boolean = false
+  
+  val memo : Map[Node, Long] = Map()   // store dyn prog... key,value
 
   var edges : ListBuffer[Node] = new ListBuffer[Node]()
 
+  
   def addEdge(node : Node) : Unit =
       edges.append( node )
 
@@ -50,6 +54,10 @@ class Node(name : String) :
 
   def setVisited(visited : Boolean) : Unit =
       this.visited = visited
+
+  def clearDynamic() : Unit =
+      // clear memo map
+      this.memo.clear()
 
   def walk(dest : Node) : Int =
 
@@ -65,6 +73,49 @@ class Node(name : String) :
           if (edgeNode.visited == false) then
               var n : Int = edgeNode.walk( dest )
               n_walks = n_walks + n
+          end if
+      end for
+
+      setVisited(false)
+
+      return n_walks
+
+  def walk2(dest : Node, dacNode : Node, fftNode : Node, dacVisited : Boolean, fftVisited : Boolean) : Long =
+
+      //println("walk2: " + this.nodeName + " dac " + dac + " fft " + fft)
+      
+      // if reached dest node, do not walk further from the end point
+      if (this == dest) then
+          //if ((dacVisited == true) && (fftVisited == true)) then
+          //    return 1
+          //else
+          //    return 0
+          // TEST time for dyn prog.
+          return 1
+
+        
+      setVisited(true)
+
+      
+      var n_walks : Long = 0
+      var n : Long = 0
+
+      for (edgeNode <- this.edges)
+          if (edgeNode.visited == false) then
+
+              // check dynamic prog table
+              val containsKey = memo.contains( edgeNode )
+              if (containsKey) then
+                  n = memo.getOrElse( edgeNode, 0 )
+                  //println("  get " + this.name + " -> " + edgeNode.getName() + " = " + n)
+              else
+                  n = edgeNode.walk2( dest, dacNode, fftNode, dacVisited || (this == dacNode), fftVisited || (this == fftNode) )
+                  // add to dynamic programming hashmap
+                  memo.put( edgeNode, n )
+                  //println("  put " + this.name + " -> " + edgeNode.getName() + " = " + n)
+              
+              n_walks = n_walks + n
+
           end if
       end for
 
@@ -100,6 +151,10 @@ class Graph() :
               break
       }
 
+  def clearDynamic() : Unit =
+      for (node <- graph)
+          node.clearDynamic()
+      
 end Graph
 
 
@@ -156,13 +211,56 @@ class AocApp extends App :
       
   end while
 
+  println("Start walking...")
+  println()
+
   var youNode : Node = g.getNodeByName( "you" )
   var outNode : Node = g.getNodeByName( "out" )
 
+  // part1
+  /*
   var n : Int = youNode.walk( outNode )
-
   println("Walks: " + n)
+  */
 
+  // part2
+  var svrNode : Node = g.getNodeByName( "svr" )
+  var fftNode : Node = g.getNodeByName( "fft" )
+  var dacNode : Node = g.getNodeByName( "dac" )
+  /*
+  var n2 : Long = svrNode.walk2( outNode, dacNode, fftNode, false, false )
+  println("Walks2: " + n2)
+  */
+  //
+  var n_svr_fft : Long = svrNode.walk2( fftNode, dacNode, fftNode, false, false )
+  println("Walks_svr_fft: " + n_svr_fft)
+  g.clearDynamic()
+  //
+  var n_svr_dac : Long = svrNode.walk2( dacNode, dacNode, fftNode, false, false)
+  println("Walks_svr_dac: " + n_svr_dac)
+  g.clearDynamic()
+  //
+  var n_fft_out : Long = fftNode.walk2( outNode, dacNode, fftNode, false, false )
+  println("Walks_fft_out: " + n_fft_out)
+  g.clearDynamic()
+  //
+  var n_dac_out : Long = dacNode.walk2( outNode, dacNode, fftNode, false, false )
+  println("Walks_dac_out: " + n_dac_out)
+  g.clearDynamic()
+  //  
+  var n_fft_dac : Long = fftNode.walk2( dacNode, dacNode, fftNode, false, false )
+  println("Walks_fft_dac: " + n_fft_dac)
+  g.clearDynamic()
+  //  
+  var n_dac_fft : Long = dacNode.walk2( fftNode, dacNode, fftNode, false, false )
+  println("Walks_dac_fft: " + n_dac_fft)
+  g.clearDynamic()
+  //  
+  var n_svr_out : Long = svrNode.walk2( outNode, dacNode, fftNode, false, false )
+  println("Walks_svr_out: " + n_svr_out)
+  g.clearDynamic()
+
+  println("sum2 = " + (n_svr_fft * n_fft_dac * n_dac_out))
 
   def getInput() : String =
     var reader = new BufferedReader(new InputStreamReader(System.in))
