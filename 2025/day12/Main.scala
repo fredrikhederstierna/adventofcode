@@ -63,19 +63,56 @@ import scala.util.control.Breaks._
 */
 
 
+/* --------------------- */
+class Present(index : Int) :
 
-class Present(name : String) :
+    var mask : Array[Array[Int]] = Array(Array(0,0,0), Array(0,0,0), Array(0,0,0))
 
+    def getIndex() : Int =
+        return this.index
+
+    def set(row : Int, col : Int) : Unit =
+        this.mask(row)(col) = 1
+    def clr(row : Int, col : Int) : Unit =
+        this.mask(row)(col) = 0
+
+    def createRotArray() : Unit =
+        println("Create all rotations list")
+        // TODO:
+        // for (i <- Range(0,3))
+        //    rot
+        // flip
+        // for (i <- Range(0,3))
+        //    rot
+        // flip
+
+    def getRotArray() : Array[Present] =
+        // TODO:
+        return null
+
+    def dump() : Unit =
+        for (r <- Range(0,3))
+            for (c <- Range(0,3))
+                  if (this.mask(r)(c) == 1) then
+                      print("#")
+                  else
+                      print(".")
+                  end if
+            end for
+            println()
+        end for
 
 end Present
 
 
+/* --------------------- */
 class Region() :
 
       
 end Region
 
 
+/* -------------------- */
 class AocApp extends App :
   println("Run...")
   println()
@@ -88,13 +125,17 @@ class AocApp extends App :
   var region : Region = new Region()
 
   var readPresents : Boolean = true
+  var presentArray : Array[Present] = new Array[Present](6)
 
   var tokens = new StringTokenizer(input, "\n", false);
+  breakable {
   while tokens.hasMoreTokens() do
   
       if (readPresents) then
           // read 6 packets
           for (n <- Range(0, 6))
+              var pr : Present = new Present(n)
+              presentArray(n) = pr
               // read index
               var pres_index = tokens.nextToken().strip()
               println("present[index " + pres_index + "] n = " + n)
@@ -109,8 +150,10 @@ class AocApp extends App :
                       var ch : Character = row_str( c )
                       if (ch == '#') then
                           present_mask(r)(c) = 1
+                          pr.set(r,c)
                       else
                           present_mask(r)(c) = 0
+                          pr.clr(r,c)
                       end if
                       //println("r " + r + ", c " + c + " = " + ch )
                   end for
@@ -125,17 +168,46 @@ class AocApp extends App :
 
           end for
           readPresents = false
+          break
 
       var token = tokens.nextToken().strip()
       var slen : Integer = token.length()
       println("token: " + token)
       
   end while
+  }
 
-  println("Start packing...")
   println()
+  println("DUMP PRESENTS")
 
-  println("xyz = ")
+  // read 6 packets
+  for (n <- Range(0, 6))
+      var pr : Present = presentArray(n)
+      println("Dump read presents index " + n + " getIndex " + pr.getIndex())
+      pr.dump()
+  end for
+
+
+  println()
+  println("Start packing...")
+
+  /* --------- read regions ---------- */
+  while tokens.hasMoreTokens() do
+
+      var token = tokens.nextToken().strip()
+      var slen : Integer = token.length()
+      println("token2: " + token)
+      var rows = (token(0) - '0') * 10 + (token(1) - '0')
+      var cols = (token(3) - '0') * 10 + (token(4) - '0')
+      var presList : Array[String] = token.substring(6).strip().split(' ')
+      println("  rows: " + rows + " cols: " + cols)
+      for (s <- presList)
+          println("    preslist.s = " + s)
+
+      // OK, from here we need to place presents in presentArray[0..5],
+      // into the Region of (rows, cols), amount of each in presList[0..5]
+
+
 
   def getInput() : String =
     var reader = new BufferedReader(new InputStreamReader(System.in))
